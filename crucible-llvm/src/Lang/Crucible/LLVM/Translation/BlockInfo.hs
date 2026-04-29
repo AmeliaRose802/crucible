@@ -261,6 +261,12 @@ instrUse from i bim = Set.unions $ case i of
   L.LandingPad _tp (Just cleanup) _ cls -> useTypedVal cleanup : map useClause cls
   L.UnaryArith _op x -> [useTypedVal x]
   L.Freeze x -> [useTypedVal x]
+  L.CleanupPad p as -> useTypedVal p : map useTypedVal as
+  L.CatchPad p as -> useTypedVal p : map useTypedVal as
+  L.CleanupRet p ml -> useTypedVal p : maybe [] (\l -> [useLabel from l bim]) ml
+  L.CatchRet p l -> [useTypedVal p, useLabel from l bim]
+  L.CatchSwitch p ls ml -> useTypedVal p : map (\l -> useLabel from l bim) ls
+                           ++ maybe [] (\l -> [useLabel from l bim]) ml
 
 useClause :: L.Clause -> Set L.Ident
 useClause (L.Catch v) = useTypedVal v
