@@ -730,6 +730,8 @@ translateConversion instr op _inty x outty = do
              return $ BaseExpr (FloatRepr fi) $ App $ FloatCast fi RNE x'
            _ -> fail (unlines [unwords ["Invalid fpext:", show op, show x, show outty], showI])
 
+    L.PtrToAddr -> fail (unlines [unwords ["Unsupported conversion: PtrToAddr", show x, show outty], showI])
+
 
 --------------------------------------------------------------------------------
 -- Bit Cast
@@ -1203,6 +1205,8 @@ atomicRWOp op x y =
         L.AtomicFSub -> nonBvError
         L.AtomicFMax -> nonBvError
         L.AtomicFMin -> nonBvError
+        L.AtomicFMaximum -> nonBvError
+        L.AtomicFMinimum -> nonBvError
       where
         zero, one :: Expr LLVM s (BVType w)
         zero = app $ BVLit w $ BV.zero w
@@ -1249,6 +1253,8 @@ atomicRWOp op x y =
         L.AtomicUMin     -> nonFloatingError
         L.AtomicUIncWrap -> nonFloatingError
         L.AtomicUDecWrap -> nonFloatingError
+        L.AtomicFMaximum -> pure $ app $ FloatMax fi xf yf
+        L.AtomicFMinimum -> pure $ app $ FloatMin fi xf yf
       where
         nonFloatingError :: forall a. LLVMGenerator s arch ret a
         nonFloatingError =

@@ -286,6 +286,8 @@ liftTypeRepr t = case t of
     L.FloatType ft -> [| FloatRepr $(liftFloatType ft) |]
     L.Label    -> fail "Cannot lift label type to repr"
     L.X86mmx   -> fail "Cannot lift X86mmx type to repr"
+    L.X86amx   -> fail "Cannot lift X86amx type to repr"
+    L.Token    -> fail "Cannot lift Token type to repr"
     L.Metadata -> fail "Cannot lift metatata type to repr"
 
   liftFloatType ft = case ft of
